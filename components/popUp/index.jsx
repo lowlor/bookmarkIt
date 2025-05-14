@@ -14,7 +14,10 @@ const PopUp = ({setAppearPopUp}) =>{
     const [image, setImage] = useState(null);
     const value = useRef(new Animated.Value(-600)).current;
     const opacityValue = useRef(new Animated.Value(0)).current;
-    const check
+    const backgroundColor = opacityValue.interpolate({
+        inputRange: [0,0.5],
+        outputRange: ['rgba(0,0,0,0)','rgba(0,0,0,0.5)']
+    })
 
     const pickImage = async() =>{
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -51,6 +54,11 @@ const PopUp = ({setAppearPopUp}) =>{
                     link: link
                 }
             ]
+            Animated.timing(opacityValue,{
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: false
+            }).start()
             Animated.timing(value,{
             toValue: -600,
             duration: 200,
@@ -95,6 +103,11 @@ const PopUp = ({setAppearPopUp}) =>{
                 {
                     text: 'Yes',
                     onPress: () => {
+                        Animated.timing(opacityValue,{
+                            toValue: 0,
+                            duration: 200,
+                            useNativeDriver: false
+                        }).start()
                         Animated.timing(value,{
                         toValue: -700,
                         duration: 200,
@@ -119,7 +132,7 @@ const PopUp = ({setAppearPopUp}) =>{
 
 
     return (
-        <Animated.View style={style.overlay}>
+        <Animated.View style={[style.overlay,{backgroundColor: backgroundColor}]}>
             <Animated.View style={[style.container,{bottom: value}]}>
                 {image ?
                 <Pressable style={style.imageInput} onPress={pickImage}>
@@ -129,7 +142,9 @@ const PopUp = ({setAppearPopUp}) =>{
                  <Pressable style={style.imageInput} onPress={pickImage}></Pressable>}
                 
                 <View style={[style.inputContainer]}>
-                    <Text style={style.text}>Name</Text>
+                    <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                        <Text style={style.text}>Name</Text>
+                    </View>
                     <TextInput 
                         style= {style.textInput}
                         onChangeText={setName}
@@ -138,7 +153,9 @@ const PopUp = ({setAppearPopUp}) =>{
                     />
                 </View>
                 <View style={[style.inputContainer]}>
-                    <Text style={style.text}>Alternate Name</Text>
+                    <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                        <Text style={style.text}>Alternate Name</Text>
+                    </View>
                     <TextInput 
                         style= {style.textInput}
                         onChangeText={setAltName}
@@ -147,7 +164,10 @@ const PopUp = ({setAppearPopUp}) =>{
                     />
                 </View>
                 <View style={style.inputContainer}>
-                    <Text style={style.text}>Link</Text>
+                    <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                        <Text style={style.text}>Link</Text>
+                        
+                    </View>
                     <TextInput
                         style= {style.linkInput}
                         onChangeText = {setLink}
@@ -156,7 +176,9 @@ const PopUp = ({setAppearPopUp}) =>{
                     />
                 </View>
                 <View style={style.inputContainer}>
+                    <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
                     <Text style={style.text}>Start With</Text>
+                    </View>
                     <TextInput 
                         style= {style.numberInput}
                         onChangeText={setEpisode}
@@ -165,7 +187,7 @@ const PopUp = ({setAppearPopUp}) =>{
                 </View>
                 <View style={style.saveBtnContainer}>
                     <Pressable android_ripple={{
-                        color: '#1d1111',
+                        color: '#000',
                         borderless: false,
                         radius: undefined,
                         foreground: true
@@ -229,7 +251,7 @@ const styles = () =>{
 
         },
         container : {
-            backgroundColor: '#ff9494',
+            backgroundColor: '#bdbdbd',
             width : '100%',
             height: 700,
             borderTopLeftRadius : 20,
@@ -239,7 +261,7 @@ const styles = () =>{
             alignItems: 'center',
             position: 'absolute',
             bottom: 0,
-            opacity: 0.8
+            opacity: 1
         },
         previewImage : {
             width: 350,
@@ -266,7 +288,7 @@ const styles = () =>{
         saveBtn: {
             height: 50,
             width: 200,
-            backgroundColor: 'red',
+            backgroundColor: '#6c6c6c',
             justifyContent: 'center',
             alignItems: 'center',
             transitionDuration: '.5s',
@@ -278,7 +300,7 @@ const styles = () =>{
         inputContainer: {
             width: '100%',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
         },
         saveBtnContainer : {
             marginTop: 10,

@@ -9,6 +9,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker'
 import PressableRipple from '../../components/PressableRipple';
 import { ensure } from "@/utils/helper";
+import Animated, { interpolate,interpolateColor, LinearTransition, useSharedValue, withSpring } from "react-native-reanimated";
 const UrlView = () =>{
     const [editPress, setEditPress] = useState<Boolean>(false);
     const {data, setData, temporary, setTemporary} = UserContext();
@@ -16,6 +17,12 @@ const UrlView = () =>{
     const [text, setText] = useState<string>('');
     const [episode, setEpisode] = useState<string>('');
     const [link, setLink] = useState<string>('');
+    const value = useSharedValue(0);
+
+    const progress = useSharedValue(0);
+
+  
+    const backgroundColor = interpolateColor(value.value,[0,1],['#fff','#bababa'])
     const handleEditBtn = (id: number) =>{
     
     }
@@ -25,8 +32,12 @@ const UrlView = () =>{
         const dataWithOutWant = data.filter((curr)=> curr.id != id);
         if(toOpen){
           dataToChange[0].isEdit = true;
+          value.value = withSpring(1)
+
         }else{
           dataToChange[0].isEdit = false;
+          value.value = withSpring(0)
+
         }
         console.log(data);
         const dataToPut = [...dataWithOutWant, dataToChange[0]];
@@ -98,7 +109,7 @@ const UrlView = () =>{
       console.log('then render item');
         return(
           <View>
-            <Pressable style={styles.listContainer} onPress={()=>goUrl(item.link)} onLongPress={()=>handleEditBtnIni(item.id,true)}>
+            <Pressable style={[styles.listContainer,{backgroundColor: backgroundColor}]} onPress={()=>goUrl(item.link)} onLongPress={()=>handleEditBtnIni(item.id,true)}>
               <View>
                 <Image style={styles.imageList} source={{uri: item.imagePath}}></Image>
               </View>
@@ -125,7 +136,7 @@ const UrlView = () =>{
       const toRenderEdit = (item : data)=>{
         return(
           <View>
-            <Pressable style={styles.listEditContainer}>
+            <Pressable style={[styles.listEditContainer,{backgroundColor: backgroundColor}]}>
               <View>
                 <Pressable onPress={()=>editPhoto()}>
                   <Image style={styles.imageList} source={image ? {uri: image} : {uri: item.imagePath}}></Image>
@@ -166,11 +177,12 @@ const UrlView = () =>{
       return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ?  'padding' : 'height'}
           style={{flex:1, height:'100%'}} keyboardVerticalOffset={1000} >
-                  <FlatList 
+                  <Animated.FlatList 
                     data={data}
                     renderItem={({item})=>item.isEdit ? toRenderEdit(item): toRenderUnEdit(item)}
                     keyExtractor={item=>item.id.toString()}
                     contentContainerStyle={styles.flatListStyle}
+                    itemLayoutAnimation={LinearTransition}
                     />
         </KeyboardAvoidingView>
         

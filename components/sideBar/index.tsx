@@ -5,7 +5,6 @@ import { UserContext } from "@/hook/context";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import PressableRipple from "../PressableRipple";
 import { data } from "@/app/(tabs)";
-
 interface SideBarSet {
     setSideBar : Dispatch<SetStateAction<boolean>>;
 }
