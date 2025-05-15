@@ -7,36 +7,38 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker'
-import PressableRipple from '../../components/PressableRipple';
+import PressableRipple from '../PressableRipple';
 import { ensure } from "@/utils/helper";
-import Animated, { interpolate,interpolateColor, LinearTransition, useSharedValue, withSpring } from "react-native-reanimated";
+import RenderItem from "../RenderItem";
+import Animated, { interpolate,interpolateColor, LinearTransition, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+
+type vStyle = {
+    id : number;
+}
+
 const UrlView = () =>{
-    const [editPress, setEditPress] = useState<Boolean>(false);
     const {data, setData, temporary, setTemporary} = UserContext();
-    const [image,setImage] = useState<string>();
-    const [text, setText] = useState<string>('');
-    const [episode, setEpisode] = useState<string>('');
-    const [link, setLink] = useState<string>('');
-    const value = useSharedValue(0);
-
-    const progress = useSharedValue(0);
-
-  
-    const backgroundColor = interpolateColor(value.value,[0,1],['#fff','#bababa'])
     const handleEditBtn = (id: number) =>{
     
     }
+
+    
     const handleEditBtnIni = (id : number, toOpen : boolean) =>{
       if(data){
         const dataToChange = data.filter((curr)=> curr.id === id);
         const dataWithOutWant = data.filter((curr)=> curr.id != id);
+
+      
+      
         if(toOpen){
           dataToChange[0].isEdit = true;
-          value.value = withSpring(1)
-
+          console.log('go this ----------------------------------- trigger open edit color');
+          
+      
         }else{
           dataToChange[0].isEdit = false;
-          value.value = withSpring(0)
+          console.log('go this ----------------------------------- trigger unedit color');
+      
 
         }
         console.log(data);
@@ -50,7 +52,7 @@ const UrlView = () =>{
       }
     }
     
-    const editPhoto = async() =>{
+    const editPhoto = async(id : number) =>{
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],
           quality: 1
@@ -59,7 +61,14 @@ const UrlView = () =>{
         console.log(result);
 
         if(!result.canceled){
-          setImage(result.assets[0].uri)
+          const dataToPut = temporary?.find(curr => curr.id === id);
+          
+          const data = temporary?.filter(curr=> curr.id != id);
+          if(data&&dataToPut){
+            dataToPut.imagePath = result.assets[0].uri;
+            setTemporary([...data,dataToPut])
+
+          }
         }
         
     }
@@ -80,9 +89,6 @@ const UrlView = () =>{
       const dataToExclude = data?.filter(curr=> curr.id != id);
       if(dataToPut && dataToExclude){
         dataToPut[0].isEdit = false;
-        if(image){
-          dataToPut[0].imagePath = image;
-        }
         //setData(data?.map((curr)=> curr.id === id ? dataToPut[0] : curr ))
         setData([...dataToExclude, dataToPut[0]])
         
@@ -105,81 +111,13 @@ const UrlView = () =>{
       setTemporary(prev => prev?.map(curr=> curr.id === id ?  {...curr, [value] : text} :  curr))
     }
 
-    const toRenderUnEdit = (item : data)=>{
-      console.log('then render item');
-        return(
-          <View>
-            <Pressable style={[styles.listContainer,{backgroundColor: backgroundColor}]} onPress={()=>goUrl(item.link)} onLongPress={()=>handleEditBtnIni(item.id,true)}>
-              <View>
-                <Image style={styles.imageList} source={{uri: item.imagePath}}></Image>
-              </View>
-              <View style={styles.listSub1Container}>
-                <Text style={styles.episode}>{item.episode}</Text>
-                <View>
-                  <Text style={styles.name}>{item.name}</Text>
-                  {item.altName ?<Text style={styles.altName}>{item.altName}</Text> : <></>}
-
-                  <View style={styles.seperator}></View>
-                </View>
-                <View style={styles.listSub2Container}>
-                  
-                 
-                  
-                </View>
-              </View>
-            </Pressable>
-          </View>
-    
-        )
-      }
-    
-      const toRenderEdit = (item : data)=>{
-        return(
-          <View>
-            <Pressable style={[styles.listEditContainer,{backgroundColor: backgroundColor}]}>
-              <View>
-                <Pressable onPress={()=>editPhoto()}>
-                  <Image style={styles.imageList} source={image ? {uri: image} : {uri: item.imagePath}}></Image>
-                </Pressable>
-              </View>
-              <View style={styles.listSub1Container}>
-                <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'name')} style={styles.editInput}
-                  value={ensure(ensure(temporary).find(x => x.id === item.id)).name} keyboardType='default'/>
-                  <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'altName')} style={styles.editInput}
-                  value={ensure(ensure(temporary).find(x => x.id === item.id)).altName} keyboardType='default'/>
-                <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'episode')} style={styles.editInput}
-                  value={ensure(ensure(temporary).find(x => x.id === item.id)).episode.toString()} keyboardType='default'/>
-                <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'link')} style={styles.editInput}
-                  value={ensure(ensure(temporary).find(x => x.id === item.id)).link} keyboardType='default'/>
-
-                <Pressable onPress={()=>handleEditBtn(item.id)}>
-                  <View style={styles.listSub2Container}>      
-                      <PressableRipple margin={[0,0,0,0]} wide={''} radius={100} onPress={()=>handleDeleteBtn(item.id)} style={styles.editStyle}>
-                        <FontAwesome5 name="trash" size={24} color="black" />
-                      </PressableRipple>
-                      <PressableRipple margin={[0,0,0,0]} wide={''} radius={100} onPress={()=>handleSaveBtn(item.id)} style={styles.editStyle}>
-                        <FontAwesome5 name="check" size={24} color="black" />
-                      </PressableRipple>
-                      <PressableRipple margin={[0,0,0,0]} wide={''} radius={100} onPress={()=>handleEditBtnIni(item.id,false)} style={styles.editStyle}>
-                        <FontAwesome6 name="xmark" size={30} color="black" />
-                      </PressableRipple>
-                  </View>
-                </Pressable>
-              </View>
-            </Pressable>
-          </View>
-    
-        )
-    
-        
-      }
-
+  
       return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ?  'padding' : 'height'}
           style={{flex:1, height:'100%'}} keyboardVerticalOffset={1000} >
                   <Animated.FlatList 
                     data={data}
-                    renderItem={({item})=>item.isEdit ? toRenderEdit(item): toRenderUnEdit(item)}
+                    renderItem={({item})=><RenderItem temporary={temporary} item={item} handleEditBtnIni={handleEditBtnIni} handleDeleteBtn={handleDeleteBtn} handleSaveBtn={handleSaveBtn} goUrl={goUrl} handleTextChange={handleTextChange} editPhoto={editPhoto}></RenderItem>}
                     keyExtractor={item=>item.id.toString()}
                     contentContainerStyle={styles.flatListStyle}
                     itemLayoutAnimation={LinearTransition}
@@ -219,26 +157,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     borderRadius: 40,
-    backgroundColor: 'white',
     marginVertical: 0,
     marginHorizontal: 'auto',
     gap: 20,
     marginBottom: 10
   },
-  listEditContainer: {
-    height: 200,
-    width: '95%',
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 40,
-    backgroundColor: '#bababa',
-    marginVertical: 0,
-    marginHorizontal: 'auto',
-    gap: 20,
-    marginBottom: 10
-  },
+
   imageList : {
     height: 180,
     width: 180,

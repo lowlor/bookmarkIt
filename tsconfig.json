@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "components/PressableRipple/index.jsx"  ]
+, "components/PressableRipple/index.jsx", "components/urlView/index.tsx"  ]
 }

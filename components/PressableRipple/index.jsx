@@ -1,7 +1,7 @@
 import {StyleSheet,BackHandler,View, Text ,TextInput,Pressable,Image, Alert}  from 'react-native'
 
-const PressableRipple  = ({children ,onPress, style, radius,wide,margin}) =>{
-    const styles = styleSheet(radius,wide,margin)
+const PressableRipple  = ({children ,onPress, style, radius,wide,margin,auto}) =>{
+    const styles = styleSheet(radius,wide,margin,auto)
     return (
         <View style={styles.container}>
             <Pressable
@@ -29,7 +29,8 @@ const styleSheet = (radius,wide,margin) => {
         alignItems: 'center',
         width: wide,
         marginLeft : margin[3],
-        marginTop: margin[0]
+        marginTop: margin[0],
+       
     },
     
 })

@@ -4,7 +4,9 @@ import { Dispatch, SetStateAction, useContext,useEffect,useState,useRef } from "
 import { UserContext } from "@/hook/context";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import PressableRipple from "../PressableRipple";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { data } from "@/app/(tabs)";
+import { exportFile } from "@/data/data";
 interface SideBarSet {
     setSideBar : Dispatch<SetStateAction<boolean>>;
 }
@@ -28,6 +30,22 @@ const SideBar = ({setSideBar} : SideBarSet) =>{
             [{
                 text: 'Yes',
                 onPress: ()=>setData([]),
+                
+            },
+            {
+                text: 'No',
+                onPress: ()=> null
+            }]
+        )
+    }
+
+    const handleExport = () =>{
+
+
+        Alert.alert('Warning','Do you want to export data?',
+            [{
+                text: 'Yes',
+                onPress: ()=>exportFile(),
                 
             },
             {
@@ -81,9 +99,13 @@ const SideBar = ({setSideBar} : SideBarSet) =>{
                             <Text style={styles.nameText}>Bookmark</Text>
                             <Text style={styles.desText}>Welcome to bookmarking application</Text>
                             <View style={styles.seperator}></View>
-                            <PressableRipple margin={[5,0,0,20]} wide={'80%'} onPress={clear} radius={50} style={styles.itemContainer}>
+                            <PressableRipple auto={false} margin={[5,0,0,20]} wide={'80%'} onPress={clear} radius={50} style={styles.itemContainer}>
                             <FontAwesome5 name="trash" size={24} color="black" />
                             <Text>Remove Data</Text>
+                            </PressableRipple>
+                            <PressableRipple auto={false} margin={[5,0,0,20]} wide={'80%'} onPress={handleExport} radius={50} style={styles.itemContainer}>
+                            <MaterialCommunityIcons name="exit-to-app" size={24} color="black" />
+                            <Text>Export Data</Text>
                             </PressableRipple>
                         </Animated.View>                      
                     </Pressable>
