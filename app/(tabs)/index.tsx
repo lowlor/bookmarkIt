@@ -1,9 +1,6 @@
 import { Image,Text, StyleSheet, Platform, FlatList,View, Pressable, KeyboardAvoidingView} from 'react-native';
 import { storage } from '@/data/data';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Header from '../../components/header';

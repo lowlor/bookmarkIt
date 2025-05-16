@@ -1,19 +1,20 @@
 import { Text,Pressable, View, StyleSheet, Alert,Animated } from "react-native";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { Dispatch, SetStateAction, useContext,useEffect,useState,useRef } from "react";
 import { UserContext } from "@/hook/context";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import PressableRipple from "../PressableRipple";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { data } from "@/app/(tabs)";
-import { exportFile } from "@/data/data";
+import { exportFile,importFile } from "@/data/data";
 interface SideBarSet {
     setSideBar : Dispatch<SetStateAction<boolean>>;
 }
 export 
 
 const SideBar = ({setSideBar} : SideBarSet) =>{
-    const {setData} = UserContext();
+    const {data,setData,setTemporary} = UserContext();
     const value = useRef(new Animated.Value(-300)).current;
     const valuePress = useRef(new Animated.Value(-300)).current;
     const opacityAni = useRef(new Animated.Value(0)).current;
@@ -39,6 +40,35 @@ const SideBar = ({setSideBar} : SideBarSet) =>{
         )
     }
 
+    const handleImport = () =>{
+        const importFileTrigger = async () =>{
+            const toPut = await importFile();
+          
+            
+            console.log(toPut);
+        
+            
+            if(toPut){            
+                setData(JSON.parse(toPut))
+                setTemporary(JSON.parse(toPut))
+            }else{
+                console.error('error in import file');
+                
+            }
+        }
+        Alert.alert('Warning','Do you want to import data?',
+            [{
+                text: 'Yes',
+                onPress: ()=>importFileTrigger(),
+                
+            },
+            {
+                text: 'No',
+                onPress: ()=> null
+            }]
+        )
+    
+    }
     const handleExport = () =>{
 
 
@@ -103,8 +133,12 @@ const SideBar = ({setSideBar} : SideBarSet) =>{
                             <FontAwesome5 name="trash" size={24} color="black" />
                             <Text>Remove Data</Text>
                             </PressableRipple>
+                             <PressableRipple auto={false} margin={[5,0,0,20]} wide={'80%'} onPress={handleImport} radius={50} style={styles.itemContainer}>
+                            <FontAwesome5 name="file-import" size={24} color="black" />
+                            <Text>Import Data</Text>
+                            </PressableRipple>
                             <PressableRipple auto={false} margin={[5,0,0,20]} wide={'80%'} onPress={handleExport} radius={50} style={styles.itemContainer}>
-                            <MaterialCommunityIcons name="exit-to-app" size={24} color="black" />
+                            <FontAwesome5 name="file-export" size={24} color="black" />
                             <Text>Export Data</Text>
                             </PressableRipple>
                         </Animated.View>                      
