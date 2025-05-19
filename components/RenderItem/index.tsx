@@ -29,8 +29,8 @@ const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handle
                           <View style={styles.listSub1Container}>
                             <Text style={styles.episode}>{item.episode}</Text>
                             <View>
-                              <Text style={styles.name}>{item.name}</Text>
-                              {item.altName ?<Text style={styles.altName}>{item.altName}</Text> : <></>}
+                              <Text numberOfLines={2} ellipsizeMode="tail" style={styles.name}>{item.name}</Text>
+                              {item.altName ?<Text numberOfLines={2} ellipsizeMode="tail" style={styles.altName}>{item.altName}</Text> : <></>}
             
                               <View style={styles.seperator}></View>
                             </View>
@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    width: 160,
+    width: 140,
     marginBottom: 1
   },
   altName: {
     fontSize: 14,
     color: 'gray',
-    width: 160,
+    width: 140,
     marginBottom: 4
   },
   seperator :{

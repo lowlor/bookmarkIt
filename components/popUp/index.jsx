@@ -3,12 +3,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker'
 import { useContext, useEffect, useRef, useState } from 'react';
 import { UserContext, UserContextPre } from '@/hook/context';
+import DatePicker from 'react-native-date-picker';
 import * as Haptics from 'expo-haptics'
 const PopUp = ({setAppearPopUp}) =>{
     const [episode, setEpisode] = useState(0);
     const [name, setName] = useState('');
     const [altName, setAltName] = useState('');
-
+    const [date , setDate] = useState(new Date());
+    const [open, setOpen] = useState(false);
     const [link, setLink] = useState('');
     const {data, setData,setTemporary} = UserContext(); 
     const [image, setImage] = useState(null);
@@ -175,16 +177,33 @@ const PopUp = ({setAppearPopUp}) =>{
                         keyboardType='default' 
                     />
                 </View>
-                <View style={style.inputContainer}>
-                    <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
-                    <Text style={style.text}>Start With</Text>
+                <View style={style.seperatorContainer}>
+                    <View style={style.inputSubContainer}>
+                        <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                        <Text style={style.text}>Episode</Text>
+                        </View>
+                        <TextInput 
+                            style= {style.numberInput}
+                            onChangeText={setEpisode}
+                            value={episode}
+                            keyboardType='decimal-pad'/>
                     </View>
-                    <TextInput 
-                        style= {style.numberInput}
-                        onChangeText={setEpisode}
-                        value={episode}
-                        keyboardType='decimal-pad'/>
+                    <View style={style.inputSubContainer}>
+                        <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                        <Text style={style.text}>Episode</Text>
+                        </View>
+                        <Pressable
+                            style= {style.numberInput}
+                            onPress={()=> setOpen(true)}
+                            keyboardType='decimal-pad'>
+                                <Text value={date}></Text>
+                        </Pressable>
+                        <DatePicker model open={open} date={date} onConfirm={(date) =>{
+                        setOpen(false)
+                        setData(date)}} onCancel={()=>{setOpen(false)}}/>
+                    </View>
                 </View>
+                
                 <View style={style.saveBtnContainer}>
                     <Pressable android_ripple={{
                         color: '#000',
@@ -299,6 +318,15 @@ const styles = () =>{
         },
         inputContainer: {
             width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        seperatorContainer : {
+            width: '100%',
+            flexDirection: 'row'
+        },
+        inputSubContainer : {
+            width: '50%',
             justifyContent: 'center',
             alignItems: 'center',
         },
