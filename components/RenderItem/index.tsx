@@ -2,6 +2,8 @@ import { data, userContextType } from "@/app/(tabs)";
 import { UserContext, UserContextPre } from "@/hook/context";
 import { LinkingContext } from "@react-navigation/native";
 import { useContext,useEffect,useState } from "react";
+import DatePicker from 'react-native-date-picker';
+
 import {FlatList, StyleSheet, Alert, Linking, Pressable, View, Image, Text, TextInput, KeyboardAvoidingView, Platform} from "react-native";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -12,7 +14,8 @@ import { ensure } from "@/utils/helper";
 import Animated, { interpolate,interpolateColor, LinearTransition, useAnimatedStyle, useSharedValue, withSpring, withTiming ,Easing  } from "react-native-reanimated";
 
 
-const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handleSaveBtn, goUrl, handleTextChange, editPhoto } : any) =>{
+const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handleSaveBtn, goUrl, handleTextChange, editPhoto, handleChangeDate } : any) =>{
+    const [open,setOpen] = useState(false);
     const value = useSharedValue(item.isEdit ? 1 : 0)
     const valueStyle = useAnimatedStyle(()=>{
         
@@ -23,7 +26,7 @@ const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handle
     const unEdit  = () =>{
         return(
                         <>
-                                                  <View>
+                          <View>
                             <Image style={styles.imageList} source={{uri: item.imagePath}}></Image>
                           </View>
                           <View style={styles.listSub1Container}>
@@ -33,6 +36,13 @@ const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handle
                               {item.altName ?<Text numberOfLines={2} ellipsizeMode="tail" style={styles.altName}>{item.altName}</Text> : <></>}
             
                               <View style={styles.seperator}></View>
+                              {item.date ? 
+                              <>
+                              <Text style={styles.date}>Next Ch. Release Date : </Text>
+                              <Text numberOfLines={2} ellipsizeMode="tail" style={styles.date}>{new Date(item.date).toISOString().slice(0,10)}</Text>
+                              </>
+                               : <></>}
+
                             </View>
                             <View style={styles.listSub2Container}>
                               
@@ -59,8 +69,21 @@ const RenderItem = ({ temporary, item, handleEditBtnIni, handleDeleteBtn, handle
                   value={ensure(ensure(temporary).find((x : any )=> x.id === item.id)).name} keyboardType='default'/>
                   <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'altName')} style={styles.editInput}
                   value={ensure(ensure(temporary).find((x :any) => x.id === item.id)).altName} keyboardType='default'/>
-                <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'episode')} style={styles.editInput}
-                  value={ensure(ensure(temporary).find((x : any) => x.id === item.id)).episode.toString()} keyboardType='default'/>
+                <View style={{flexDirection:'row'}}>
+                    <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'episode')} style={[styles.editInputSub,{width:50}]}
+                      value={ensure(ensure(temporary).find((x : any) => x.id === item.id)).episode.toString()} keyboardType='default'/>
+                    
+                    {item.date ? 
+                    <>
+                    <Pressable onPress={()=>setOpen(true)} style={styles.editInputSubDate}>
+                      <Text style={{color:'white'}}>{new Date(ensure(ensure(temporary).find((x : any) => x.id === item.id)).date).toISOString().slice(0,10)}</Text>
+                    </Pressable>   
+                    <DatePicker modal open={open} mode='date' date={new Date(ensure(ensure(temporary).find((x : any) => x.id === item.id)).date)} onConfirm={(date) =>{
+                                            setOpen(false)
+                                            handleChangeDate(item.id,date)}} onCancel={()=>{setOpen(false)}}/>
+                    </> : <></>}
+                    
+                </View>
                 <TextInput onChangeText={(v)=>handleTextChange(v,item.id,'link')} style={styles.editInput}
                   value={ensure(ensure(temporary).find((x : any) => x.id === item.id)).link} keyboardType='default'/>
 
@@ -195,8 +218,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     backgroundColor: 'black'
   },
+  editInputSub: {
+    borderColor: '#fff',
+    fontSize:15,
+    color: 'white',
+    width:90,
+    borderWidth: 2,
+    borderRadius: 20,
+    height: 30,
+    paddingHorizontal: 5,
+    backgroundColor: 'black'
+  },
+  editInputSubDate: {
+    borderColor: '#fff',
+    fontSize:15,
+    color: 'white',
+    width:90,
+    borderWidth: 2,
+    borderRadius: 20,
+    height: 30,
+    paddingHorizontal: 5,
+    backgroundColor: 'black',
+    alignItems:'center',justifyContent:'center'
+  },
   name: {
     fontSize: 18,
+    width: 140,
+    marginBottom: 1
+  },
+  date: {
+    fontSize: 12,
     width: 140,
     marginBottom: 1
   },
@@ -209,13 +260,14 @@ const styles = StyleSheet.create({
   seperator :{
     borderTopWidth: 2,
     borderColor: 'gray',
-    width: 140
+    width: 140,
+    marginBottom: 4
   },
   episode: {
-    fontSize: 80,
+    fontSize: 60,
     position: 'absolute',
-    bottom: -20,
-    right: 20,
+    bottom: -10,
+    right: 0,
     opacity: 0.1,
     zIndex: -2,
     padding: 0,

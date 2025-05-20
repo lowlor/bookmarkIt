@@ -52,6 +52,15 @@ const UrlView = () =>{
       }
     }
     
+    const handleChangeDate = async(id: number, date : Date) =>{
+        const dataToPut = temporary?.find(curr => curr.id === id);
+        const allData = temporary?.filter(curr=> curr.id != id);
+        if(dataToPut && allData){
+          dataToPut.date = date;
+          setTemporary([...allData,dataToPut ])
+
+        }
+    }
     const editPhoto = async(id : number) =>{
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],
@@ -111,19 +120,18 @@ const UrlView = () =>{
       setTemporary(prev => prev?.map(curr=> curr.id === id ?  {...curr, [value] : text} :  curr))
     }
 
+    
   
       return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ?  'padding' : 'height'}
-          style={{flex:1, height:'100%'}} keyboardVerticalOffset={1000} >
+            
                   <Animated.FlatList 
                     data={data}
-                    renderItem={({item})=><RenderItem temporary={temporary} item={item} handleEditBtnIni={handleEditBtnIni} handleDeleteBtn={handleDeleteBtn} handleSaveBtn={handleSaveBtn} goUrl={goUrl} handleTextChange={handleTextChange} editPhoto={editPhoto}></RenderItem>}
+                    renderItem={({item})=><RenderItem temporary={temporary} item={item} handleEditBtnIni={handleEditBtnIni} handleDeleteBtn={handleDeleteBtn} handleSaveBtn={handleSaveBtn} goUrl={goUrl} handleTextChange={handleTextChange} editPhoto={editPhoto} handleChangeDate={handleChangeDate}></RenderItem>}
                     keyExtractor={item=>item.id.toString()}
                     contentContainerStyle={styles.flatListStyle}
                     itemLayoutAnimation={LinearTransition}
                     />
-        </KeyboardAvoidingView>
-        
+                 
       )
 
 }
@@ -188,6 +196,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexGrow: 1,
     marginTop: 10,
+    paddingBottom: 300
   },
   editStyle : {
     justifyContent: 'center',

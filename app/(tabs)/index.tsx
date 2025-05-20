@@ -17,6 +17,7 @@ export type data = {
   imagePath: string;
   link : string;
   isEdit : boolean;
+  date: Date;
 
 }
 
@@ -88,9 +89,11 @@ export default function HomeScreen() {
   return (
     <UserContextPre.Provider value={{data, setData,temporary,setTemporary}}>
       <SafeAreaProvider>
-          {appearPopUp ? <PopUp setAppearPopUp={setAppearPopup}></PopUp> : appearSideBar ? <SideBar setSideBar={setAppearSideBar}></SideBar>:<></>}
-          <Header setAppearSideBar={setAppearSideBar} appearPopUp={appearPopUp} setAppearPopup={setAppearPopup}></Header>
-          <UrlView></UrlView> 
+       
+            {appearPopUp ? <PopUp setAppearPopUp={setAppearPopup}></PopUp> : appearSideBar ? <SideBar setSideBar={setAppearSideBar}></SideBar>:<></>}
+            <Header setAppearSideBar={setAppearSideBar} appearPopUp={appearPopUp} setAppearPopup={setAppearPopup}></Header>
+            <UrlView></UrlView> 
+       
       </SafeAreaProvider>
     </UserContextPre.Provider>
     

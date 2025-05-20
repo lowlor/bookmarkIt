@@ -10,6 +10,7 @@ const PopUp = ({setAppearPopUp}) =>{
     const [name, setName] = useState('');
     const [altName, setAltName] = useState('');
     const [date , setDate] = useState(new Date());
+    const [initDate, setIniDate] = useState(false);
     const [open, setOpen] = useState(false);
     const [link, setLink] = useState('');
     const {data, setData,setTemporary} = UserContext(); 
@@ -53,7 +54,8 @@ const PopUp = ({setAppearPopUp}) =>{
                     imagePath : image,
                     episode: episode,
                     isEdit: false,
-                    link: link
+                    link: link,
+                    date: initDate ? date : null
                 }
             ]
             Animated.timing(opacityValue,{
@@ -82,6 +84,7 @@ const PopUp = ({setAppearPopUp}) =>{
         
     }
 
+    console.log(date.getMonth());
     
     useEffect(()=>{
         console.log('tst');
@@ -125,13 +128,15 @@ const PopUp = ({setAppearPopUp}) =>{
             exitFunc
         )
 
+        console.log(date);
+        
         return ()=>{
             backHandler.remove();
         }
     },[])
 
     
-
+    
 
     return (
         <Animated.View style={[style.overlay,{backgroundColor: backgroundColor}]}>
@@ -178,31 +183,30 @@ const PopUp = ({setAppearPopUp}) =>{
                     />
                 </View>
                 <View style={style.seperatorContainer}>
-                    <View style={style.inputSubContainer}>
-                        <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
+                    <View style={style.inputSubContainerLeft}>
+                    
                         <Text style={style.text}>Episode</Text>
-                        </View>
+                  
                         <TextInput 
                             style= {style.numberInput}
                             onChangeText={setEpisode}
                             value={episode}
                             keyboardType='decimal-pad'/>
                     </View>
-                    <View style={style.inputSubContainer}>
-                        <View style={{width: '100%', alignItems: 'flex-start', marginLeft: 50}}>
-                        <Text style={style.text}>Episode</Text>
-                        </View>
+                    <View style={style.inputSubContainerRight}>
+                        <Text style={style.text}>Next Ch. Release date</Text>
                         <Pressable
-                            style= {style.numberInput}
+                            style= {[style.numberInput,{alignItems:'center'}]}
                             onPress={()=> setOpen(true)}
-                            keyboardType='decimal-pad'>
-                                <Text value={date}></Text>
+                            >
+                                <Text style={{color:'#000000'}}>{initDate ? date.toISOString().slice(0,10) : ''}</Text>
                         </Pressable>
-                        <DatePicker model open={open} date={date} onConfirm={(date) =>{
+                        <DatePicker modal open={open} mode='date' date={date} onConfirm={(date) =>{
                         setOpen(false)
-                        setData(date)}} onCancel={()=>{setOpen(false)}}/>
+                        setDate(date)
+                        setIniDate(true)}} onCancel={()=>{setOpen(false)}}/>
                     </View>
-                </View>
+               </View>
                 
                 <View style={style.saveBtnContainer}>
                     <Pressable android_ripple={{
@@ -225,7 +229,7 @@ const styles = () =>{
     return StyleSheet.create({
         text : {
             color: 'white',
-            fontSize: 20
+            fontSize: 16
         },
         textInput : {
             borderColor: 'white',
@@ -242,7 +246,7 @@ const styles = () =>{
             borderColor: 'white',
             borderRadius: 20,
             borderWidth: 2,
-            width: '90%',
+            width: '80%',
             height: 40,
             flexDirection: 'row',
             backgroundColor: 'white',
@@ -325,10 +329,19 @@ const styles = () =>{
             width: '100%',
             flexDirection: 'row'
         },
-        inputSubContainer : {
+        inputSubContainerLeft : {
             width: '50%',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
+            flexDirection: 'column',
+            marginLeft: 20
+        },
+        inputSubContainerRight : {
+            width: '50%',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            flexDirection: 'column',
+            marginRight: 20
         },
         saveBtnContainer : {
             marginTop: 10,
